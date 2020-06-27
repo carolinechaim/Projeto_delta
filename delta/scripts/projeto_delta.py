@@ -49,8 +49,8 @@ id = 0
 
 
 
-x5 = None
-y5= None
+x_odon = 0
+y_odon= 0
 rad_z = 0.0
 
 contador = 0
@@ -107,13 +107,13 @@ def recebe(msg):
 
 
 def recebe_odometria(data):
-    global x5
-    global y5
+    global x_odon
+    global y_odon
     global rad_z
     global contador
 
-    x5 = data.pose.pose.position.x
-    y5 = data.pose.pose.position.y
+    x_odon = data.pose.pose.position.x
+    y_odon = data.pose.pose.position.y
 
     quat = data.pose.pose.orientation
     lista = [quat.x, quat.y, quat.z, quat.w]
@@ -122,7 +122,7 @@ def recebe_odometria(data):
     angulos = np.degrees(angulos_rad)    
 
     if contador % pula == 0:
-        print("Posicao (x,y)  ({:.2f} , {:.2f}) + angulo {:.2f}".format(x, y,angulos[2]))
+        print("Posicao (x,y)  ({:.2f} , {:.2f}) + angulo {:.2f}".format(x_odon, y_odon,angulos[2]))
     contador = contador + 1
 
 v_ang = 0.3
@@ -131,8 +131,8 @@ v_lin = 0.3
 
 
 def go_to(x1, y1, pub):
-    x0 = x # Vai ser atualizado via global e odometria em um thread paralelo
-    y0 = y # global e odometria (igual ao acima)
+    x0 = x_odon # Vai ser atualizado via global e odometria em um thread paralelo
+    y0 = y_odon # global e odometria (igual ao acima)
     delta_x = x1 - x0
     delta_y = y1 - y0
 
@@ -165,11 +165,11 @@ def go_to(x1, y1, pub):
         rospy.sleep(delta_t)
         pub.publish(zero)
         rospy.sleep(0.1)  
-        x0 = x
-        y0 = y
+        x0 = x_odon
+        y0 = y_odon
         delta_x = x1 - x0
         delta_y = y1 - y0
-        h = math.sqrt(deltScreencast) #from 15 06 2020 17:39:42
+
 
 
 
@@ -213,7 +213,7 @@ if __name__=="__main__":
 
     lado = 3
 
-    verts = [(0,0), (-lado/2,0), (0, lado*math.sqrt(3)/2.0),(lado/2,0), (0,0)]
+    verts = [(0,0), (-0.81 , -3.44), (0, lado*math.sqrt(3)/2.0),(lado/2,0), (0,0)]
 
 
     print("Usando ", topico_imagem)
@@ -235,10 +235,10 @@ if __name__=="__main__":
             for r in resultados:
                 print(r)
 
-            #for p in verts:
-                ##go_to(p[0],p[1], velocidade_saida)
-                #rospy.sleep(1.0)
-            #velocidade_saida.publish(vel)
+            for p in verts:
+                go_to(p[0],p[1], velocidade_saida)
+                rospy.sleep(1.0)
+            velocidade_saida.publish(vel)
 
             if cv_image is not None:
                 # Note que o imshow precisa ficar *ou* no codigo de tratamento de eventos *ou* no thread principal, não em ambos
