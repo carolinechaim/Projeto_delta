@@ -126,7 +126,7 @@ def recebe_odometria(data):
     contador = contador + 1
 
 v_ang = 0.3
-v_lin = 0.3
+v_lin = 0.5
 
 
 
@@ -138,6 +138,7 @@ def go_to(x1, y1, pub):
 
     h = math.sqrt(delta_x**2 + delta_y**2) # Distancia ate o destino. Veja 
     # https://web.microsoftstream.com/video/f039d50f-3f6b-4e01-b45c-f2bffd2cbd84
+    print("Goal ", x1,",",y1)
 
     while h > 0.3:      
         print("Goal ", x1,",",y1)
@@ -169,6 +170,7 @@ def go_to(x1, y1, pub):
         y0 = y_odon
         delta_x = x1 - x0
         delta_y = y1 - y0
+        h = math.sqrt(delta_x**2 + delta_y**2)
 
 
 
@@ -213,7 +215,7 @@ if __name__=="__main__":
 
     lado = 3
 
-    verts = [(0,0), (-0.81 , -3.44), (0, lado*math.sqrt(3)/2.0),(lado/2,0), (0,0)]
+    verts = [(0,0),(-6.0 , -5.0), (-12.0 , -5.0),(-18.0,-5.0), (0,0)]
 
 
     print("Usando ", topico_imagem)
