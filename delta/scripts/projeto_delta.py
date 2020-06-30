@@ -126,11 +126,11 @@ def recebe_odometria(data):
     contador = contador + 1
 
 v_ang = 0.3
-v_lin = 0.5
+v_lin = 0.3
 
 
 
-def go_to(x1, y1, pub):
+def go_to(x1, y1, pub, booleano):
     x0 = x_odon # Vai ser atualizado via global e odometria em um thread paralelo
     y0 = y_odon # global e odometria (igual ao acima)
     delta_x = x1 - x0
@@ -139,8 +139,9 @@ def go_to(x1, y1, pub):
     h = math.sqrt(delta_x**2 + delta_y**2) # Distancia ate o destino. Veja 
     # https://web.microsoftstream.com/video/f039d50f-3f6b-4e01-b45c-f2bffd2cbd84
     print("Goal ", x1,",",y1)
+    zero = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
-    while h > 0.3:      
+    while h > 0.5:      
         print("Goal ", x1,",",y1)
         # Rotacao
         ang_goal = math.atan2(delta_y,delta_x)  
@@ -148,6 +149,9 @@ def go_to(x1, y1, pub):
         dif_ang = ang_goal - ang_atual
         delta_t = abs(dif_ang)/v_ang
         # Twist
+        zero = Twist(Vector3(0,0,0), Vector3(0,0,0))
+        print (ang_atual)
+        print (ang_goal)
         if dif_ang > 0.0:
             vel_rot = Twist(Vector3(0,0,0), Vector3(0,0,v_ang))
         elif dif_ang <=0:
@@ -156,7 +160,7 @@ def go_to(x1, y1, pub):
         pub.publish(vel_rot)
         # sleep
         rospy.sleep(delta_t)
-        zero = Twist(Vector3(0,0,0), Vector3(0,0,0))
+        
         pub.publish(zero)
         rospy.sleep(0.1)
         # Translacao
@@ -165,12 +169,28 @@ def go_to(x1, y1, pub):
         pub.publish(linear)
         rospy.sleep(delta_t)
         pub.publish(zero)
-        rospy.sleep(0.1)  
+        rospy.sleep(0.1)
         x0 = x_odon
         y0 = y_odon
         delta_x = x1 - x0
         delta_y = y1 - y0
         h = math.sqrt(delta_x**2 + delta_y**2)
+
+    print("no eixo correto")
+
+    pub.publish(zero)
+    rospy.sleep(0.1)
+
+    if booleano:
+
+        print ("dando volta 360:")
+
+        vel_rot = Twist(Vector3(0,0,0), Vector3(0,0,v_ang))
+        # publish
+        pub.publish(vel_rot)
+        # sleep
+        rospy.sleep(2*3.1415/v_ang)    
+
 
 
 
@@ -202,6 +222,13 @@ def roda_todo_frame(imagem):
         depois = time.clock()
 
         cv_image = saida_net.copy()
+
+
+        if cv_image is not None:
+            # Note que o imshow precisa ficar *ou* no codigo de tratamento de eventos *ou* no thread principal, não em ambos
+            cv2.imshow("cv_image no loop principal", cv_image)
+            cv2.waitKey(1)        
+
     except CvBridgeError as e:
         print('ex', e)
     
@@ -213,9 +240,9 @@ if __name__=="__main__":
     recebedor = rospy.Subscriber(topico_imagem, CompressedImage, roda_todo_frame, queue_size=4, buff_size = 2**24)
     recebedor = rospy.Subscriber("/ar_pose_marker", AlvarMarkers, recebe) # Para recebermos notificacoes de que marcadores foram vistos
 
-    lado = 3
 
-    verts = [(0,0),(-6.0 , -5.0), (-12.0 , -5.0),(-18.0,-5.0), (0,0)]
+    verts = [(0.0 , 0.0, False),(0.0 , -3.5, False), (-3.0 , -4,False),(-6.0 , -4,True), (-9.0 , -4,False),(-12.0,-4,False),(-15.0,-4,False),
+    (-18.0,-4,True), (-19.0,-4,False), (-19.0,0,True)]
 
 
     print("Usando ", topico_imagem)
@@ -238,14 +265,11 @@ if __name__=="__main__":
                 print(r)
 
             for p in verts:
-                go_to(p[0],p[1], velocidade_saida)
+                go_to(p[0],p[1], velocidade_saida, p[2])
                 rospy.sleep(1.0)
             velocidade_saida.publish(vel)
 
-            if cv_image is not None:
-                # Note que o imshow precisa ficar *ou* no codigo de tratamento de eventos *ou* no thread principal, não em ambos
-                cv2.imshow("cv_image no loop principal", cv_image)
-                cv2.waitKey(1)
+
             #rospy.sleep(0.1)
 
     except rospy.ROSInterruptException:
