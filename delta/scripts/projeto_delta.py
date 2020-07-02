@@ -21,7 +21,6 @@ from ar_track_alvar_msgs.msg import AlvarMarker, AlvarMarkers
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Header
 
-
 import visao_module
 
 import detecta_esferas
@@ -255,21 +254,19 @@ def roda_todo_frame(imagem):
                     font = cv2.FONT_HERSHEY_COMPLEX_SMALL
                     print ("objeto {obj} encontrado".format(obj = i))
                     cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
+                    cv2.imshow("{obj}".format(obj = i), cv_image)
             
             for i in GOAL:
 
                 LOCALIZADO_MOB, saida_net =  visao_module.processa(temp_image,i) 
 
-
                 if LOCALIZADO_MOB:
                     font = cv2.FONT_HERSHEY_COMPLEX_SMALL
                     print ("objeto {obj} encontrado".format(obj = i))
                     cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
-                   
-
+                    cv2.imshow("{obj}".format(obj = i), cv_image)
 
         cv_image = saida_net.copy()
-
 
         if cv_image is not None:
             # Note que o imshow precisa ficar *ou* no codigo de tratamento de eventos *ou* no thread principal, não em ambos
@@ -300,13 +297,10 @@ if __name__=="__main__":
     tfl = tf2_ros.TransformListener(tf_buffer) #conversao do sistema de coordenadas 
     tolerancia = 25
 
-
     try:
 
         vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
-
-        
         while not rospy.is_shutdown():
             for r in resultados:
                 print(r)
@@ -316,12 +310,7 @@ if __name__=="__main__":
                 rospy.sleep(1.0)
             velocidade_saida.publish(vel)
 
-
             #rospy.sleep(0.1)
-
-
 
     except rospy.ROSInterruptException:
         print("Ocorreu uma exceção com o rospy")
-
-

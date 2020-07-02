@@ -161,7 +161,7 @@ def roda_todo_frame(imagem):
             circle_delta = delta_green
             cv2.imshow("Green", img_g)
             cv2.waitKey(1)
-        if goal == "green":
+        if goal == "red":
             circle_visible = tem_red
             circle_delta = delta_red
             cv2.imshow("Red", img_r)
@@ -169,4 +169,3 @@ def roda_todo_frame(imagem):
 
     except CvBridgeError as e:
         print('ex', e)
-
