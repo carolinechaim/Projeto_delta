@@ -96,20 +96,22 @@ def processa_circulos_controle(img_bgr, OBJETO):
     cor_r = (0, 0,255)
 
     if OBJETO == "red_sphere":
-        tem, centro_r, raio_r, img = maior_circulo(red, cor_r)
+        tem, centro, raio, img = maior_circulo(red, cor_r)
 
     elif OBJETO == "blue_sphere":
-        tem, centro_b, raio_n, img = maior_circulo(blue, cor_b)
+        tem, centro, raio, img = maior_circulo(blue, cor_b)
 
     elif OBJETO == "green_sphere":
-        tem, centro_g, raio_g, img = maior_circulo(green, cor_g)
+        tem, centro, raio, img = maior_circulo(green, cor_g)
 
     else:
         tem = False
+        centro = 0
+        raio = 0
         img = img_bgr  
 
 
-    return tem, img    
+    return tem, centro, raio, img   
 
     
 
