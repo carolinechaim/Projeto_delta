@@ -74,7 +74,7 @@ def detect(frame, objeto):
         confidence = detections[0, 0, i, 2]
         idx = int(detections[0, 0, i, 1])
 
-        if PROCURA == idx:
+        if idx == PROCURA:
 
             if confidence > confianca:
                 LOCALIZADO = True
@@ -101,7 +101,7 @@ def detect(frame, objeto):
 
 
     # show the output image
-    return image, LOCALIZADO
+        return image, LOCALIZADO
 
 
 

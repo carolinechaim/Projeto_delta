@@ -243,9 +243,12 @@ def roda_todo_frame(imagem):
 
         depois = time.clock()
 
+        saida_net = temp_image
+
         
 
         if PROCURANDO:
+            
             for i in GOAL:
                 LOCALIZADO_SPHERE, saida_net = detecta_esferas.processa_circulos_controle(temp_image, i)
                 if LOCALIZADO_SPHERE:
@@ -265,9 +268,7 @@ def roda_todo_frame(imagem):
                    
 
 
-        
-        print (REMOVE)
-        cv_image = temp_image.copy()
+        cv_image = saida_net.copy()
 
 
         if cv_image is not None:
@@ -317,6 +318,8 @@ if __name__=="__main__":
 
 
             #rospy.sleep(0.1)
+
+
 
     except rospy.ROSInterruptException:
         print("Ocorreu uma exceção com o rospy")
