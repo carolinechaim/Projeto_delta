@@ -39,7 +39,7 @@ net = cv2.dnn.readNetFromCaffe(proto, model)
 # implementation)
 
 
-def detect(frame):
+def detect(frame, objeto):
     image = frame.copy()
     (h, w) = image.shape[:2]
     blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
@@ -52,37 +52,56 @@ def detect(frame):
 
     results = []
 
+    if objeto == "person":
+        PROCURA = 15
+    elif objeto == "dog":
+        PROCURA = 12
+    elif objeto == "bird":
+        PROCURA = 3
+    elif objeto == "cat":
+        PROCURA = 8
+    elif objeto == "bike":
+        PROCURA = 2
+    else:
+        PROCURA = None
+        
+
     # loop over the detections
     for i in np.arange(0, detections.shape[2]):
         # extract the confidence (i.e., probability) associated with the
         # prediction
+
         confidence = detections[0, 0, i, 2]
+        idx = int(detections[0, 0, i, 1])
 
-        # filter out weak detections by ensuring the `confidence` is
-        # greater than the minimum confidence
+        if PROCURA == idx:
 
+            if confidence > confianca:
+                LOCALIZADO = True
+                # extract the index of the class label from the `detections`,
+                # then compute the (x, y)-coordinates of the bounding box for
+                # the object
+                
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
 
-        if confidence > confianca:
-            # extract the index of the class label from the `detections`,
-            # then compute the (x, y)-coordinates of the bounding box for
-            # the object
-            idx = int(detections[0, 0, i, 1])
-            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-            (startX, startY, endX, endY) = box.astype("int")
+                # display the prediction
+                label = "{}: {:.2f}%".format(CLASSES[idx], confidence * 100)
+                #print("[INFO] {}".format(label))
+                cv2.rectangle(image, (startX, startY), (endX, endY),
+                    COLORS[idx], 2)
+                y = startY - 15 if startY - 15 > 15 else startY + 15
+                cv2.putText(image, label, (startX, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
 
-            # display the prediction
-            label = "{}: {:.2f}%".format(CLASSES[idx], confidence * 100)
-            #print("[INFO] {}".format(label))
-            cv2.rectangle(image, (startX, startY), (endX, endY),
-                COLORS[idx], 2)
-            y = startY - 15 if startY - 15 > 15 else startY + 15
-            cv2.putText(image, label, (startX, y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+                results.append((CLASSES[idx], confidence*100, (startX, startY),(endX, endY) ))
+        else:
+            image = frame
+            LOCALIZADO = False
 
-            results.append((CLASSES[idx], confidence*100, (startX, startY),(endX, endY) ))
 
     # show the output image
-    return image, results
+    return image, LOCALIZADO
 
 
 

@@ -18,10 +18,10 @@ import mobilenet_simples as mnet
 
 
 
-def processa(frame):
+def processa(frame, objeto):
     '''Use esta funcao para basear o processamento do seu robo'''
 
-    result_frame, result_tuples = mnet.detect(frame)
+    result_frame, LOCALIZADO = mnet.detect(frame, objeto)
 
     centro = (frame.shape[1]//2, frame.shape[0]//2)
 
@@ -33,7 +33,7 @@ def processa(frame):
     cross(result_frame, centro, [255,0,0], 1, 17)
 
 
-    return centro, result_frame, result_tuples
+    return  LOCALIZADO, result_frame
 
 
 

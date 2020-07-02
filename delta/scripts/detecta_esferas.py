@@ -97,18 +97,19 @@ def processa_circulos_controle(img_bgr, OBJETO):
 
     if OBJETO == "red_sphere":
         tem, centro_r, raio_r, img = maior_circulo(red, cor_r)
-        return tem, img
 
     elif OBJETO == "blue_sphere":
         tem, centro_b, raio_n, img = maior_circulo(blue, cor_b)
-        return tem, img
 
     elif OBJETO == "green_sphere":
         tem, centro_g, raio_g, img = maior_circulo(green, cor_g)
-        return tem, img 
 
     else:
-        pass    
+        tem = False
+        img = img_bgr  
+
+
+    return tem, img    
 
     
 
@@ -169,67 +170,3 @@ def roda_todo_frame(imagem):
     except CvBridgeError as e:
         print('ex', e)
 
-if __name__=="__main__":
-
-    rospy.init_node("q4")
-
-    topico_imagem = "/camera/rgb/image_raw/compressed"
-    velocidade_saida = rospy.Publisher("/cmd_vel", Twist, queue_size = 3 )
-    recebe_scan = rospy.Subscriber("/scan", LaserScan, scaneou)
-    recebedor = rospy.Subscriber(topico_imagem, CompressedImage, roda_todo_frame, queue_size=4, buff_size = 2**24)
-
-    delta_tolerance = 5
-    dist_tolerance = 0.1
-    metro = 1.0
-
-    rot = Twist(Vector3(0,0,0), Vector3(0,0,0.1))
-    frente = Twist(Vector3(0.2,0,0), Vector3(0,0,0))
-    zero = Twist(Vector3(0,0,0), Vector3(0,0,0))
-    
-    PROCURANDO, CENTRALIZANDO, AVANCANDO, PARADO = 1,2,3,4
-
-    state = PROCURANDO
-
-    # Evitando bugs em algun setups
-    velocidade_saida.publish(zero)
-    rospy.sleep(1.0)
-
-    def printstate(state):
-        if state == PROCURANDO:
-            print("PROCURANDO")
-        if state == CENTRALIZANDO:
-            print("CENTRALIZANDO")            
-        if state == AVANCANDO:
-            print("AVANCANDO")            
-        if state == PARADO:
-            print("PARADO")                        
-
-    dt = 0.05
-
-    while not rospy.is_shutdown():
-        printstate(state)
-        if state == PROCURANDO:
-            velocidade_saida.publish(rot)
-            if circle_visible == True:
-                state = CENTRALIZANDO
-                velocidade_saida.publish(zero)                
-                rospy.sleep(dt)                
-        if state == CENTRALIZANDO:          
-            print("Delta", circle_delta)
-            atuacao = -circle_delta/275.0*0.3
-            rot = Twist(Vector3(0,0,0), Vector3(0,0,atuacao))
-            velocidade_saida.publish(rot)            
-            if abs(circle_delta) < delta_tolerance:
-                state = AVANCANDO
-                velocidade_saida.publish(zero)              
-                rospy.sleep(dt)
-        if state == AVANCANDO:
-            velocidade_saida.publish(frente)
-            if metro - dist_tolerance < distancia < metro + dist_tolerance:
-                state = PARADO
-                velocidade_saida.publish(zero)
-                rospy.sleep(dt)
-        if state == PARADO:
-            velocidade_saida.publish(zero)
-
-        rospy.sleep(dt)

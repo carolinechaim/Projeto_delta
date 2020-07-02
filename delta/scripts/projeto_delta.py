@@ -27,11 +27,12 @@ import visao_module
 import detecta_esferas
 
 ####################
-GOAL = ["cat", "red_sphere"]
+GOAL = ["dog", "green_sphere"]
 ####################
 
 PROCURANDO = False
-LOCALIZADO = False
+LOCALIZADO_SPHERE = False
+LOCALIZADO_MOB = False
 
 REMOVE =[]
 
@@ -209,7 +210,7 @@ def go_to(x1, y1, pub, booleano):
         # publish
         pub.publish(vel_rot)
         # sleep
-        rospy.sleep(2*3.1415/v_ang)    
+        rospy.sleep(math.pi * 2/v_ang)    
 
 
 
@@ -222,9 +223,11 @@ def roda_todo_frame(imagem):
     global media
     global centro
     global resultados
-    global LOCALIZADO
+    global LOCALIZADO_SPHERE
+    global LOCALIZADO_MOB
 
-    LOCALIZADO = False
+    LOCALIZADO_SPHERE = False
+    LOCALIZADO_MOB = False
 
     now = rospy.get_rostime()
     imgtime = imagem.header.stamp
@@ -237,10 +240,6 @@ def roda_todo_frame(imagem):
         antes = time.clock()
         temp_image = bridge.compressed_imgmsg_to_cv2(imagem, "bgr8")
 
-        centro, saida_net, resultados =  visao_module.processa(temp_image)        
-        for r in resultados:
-       
-            pass
 
         depois = time.clock()
 
@@ -248,15 +247,26 @@ def roda_todo_frame(imagem):
 
         if PROCURANDO:
             for i in GOAL:
-                LOCALIZADO, saida_net = detecta_esferas.processa_circulos_controle(temp_image, i)
-
-
-                if LOCALIZADO:
+                LOCALIZADO_SPHERE, saida_net = detecta_esferas.processa_circulos_controle(temp_image, i)
+                if LOCALIZADO_SPHERE:
                     font = cv2.FONT_HERSHEY_COMPLEX_SMALL
-                    print ("objeto encontrado")
-                    cv2.putText(temp_image,"Objeto encontrado",(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
-                    REMOVE.append(i)
+                    print ("objeto {obj} encontrado".format(obj = i))
+                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
+            
+            for i in GOAL:
 
+                LOCALIZADO_MOB, saida_net =  visao_module.processa(temp_image,i) 
+
+
+                if LOCALIZADO_MOB:
+                    font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+                    print ("objeto {obj} encontrado".format(obj = i))
+                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
+                   
+
+
+        
+        print (REMOVE)
         cv_image = temp_image.copy()
 
 
@@ -277,7 +287,7 @@ if __name__=="__main__":
     recebedor = rospy.Subscriber("/ar_pose_marker", AlvarMarkers, recebe) # Para recebermos notificacoes de que marcadores foram vistos
 
 
-    verts = [(0.0 , 0.0, False),(0.0 , -3.5, False), (-3.0 , -4,False),(-6.0 , -4,True), (-9.0 , -4,False),(-12.0,-4,False),(-15.0,-4,False),
+    verts = [(0.0 , 0.0, False),(0.0 , -3.5, True), (-3.0 , -4,False),(-6.0 , -4,True), (-9.0 , -4,False),(-12.0,-4,False),(-15.0,-4,False),
     (-18.0,-4,True), (-19.0,-4,False), (-19.0,0,True)]
 
 
