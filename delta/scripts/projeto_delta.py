@@ -24,6 +24,18 @@ from std_msgs.msg import Header
 
 import visao_module
 
+import detecta_esferas
+
+####################
+GOAL = ["cat", "red_sphere"]
+####################
+
+PROCURANDO = False
+LOCALIZADO = False
+
+REMOVE =[]
+
+
 
 bridge = CvBridge()
 
@@ -131,6 +143,9 @@ v_lin = 0.3
 
 
 def go_to(x1, y1, pub, booleano):
+
+    global PROCURANDO
+
     x0 = x_odon # Vai ser atualizado via global e odometria em um thread paralelo
     y0 = y_odon # global e odometria (igual ao acima)
     delta_x = x1 - x0
@@ -141,7 +156,10 @@ def go_to(x1, y1, pub, booleano):
     print("Goal ", x1,",",y1)
     zero = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
-    while h > 0.5:      
+    while h > 0.5:   
+
+        PROCURANDO = False
+
         print("Goal ", x1,",",y1)
         # Rotacao
         ang_goal = math.atan2(delta_y,delta_x)  
@@ -183,6 +201,8 @@ def go_to(x1, y1, pub, booleano):
 
     if booleano:
 
+        PROCURANDO = True
+
         print ("dando volta 360:")
 
         vel_rot = Twist(Vector3(0,0,0), Vector3(0,0,v_ang))
@@ -202,6 +222,9 @@ def roda_todo_frame(imagem):
     global media
     global centro
     global resultados
+    global LOCALIZADO
+
+    LOCALIZADO = False
 
     now = rospy.get_rostime()
     imgtime = imagem.header.stamp
@@ -221,7 +244,20 @@ def roda_todo_frame(imagem):
 
         depois = time.clock()
 
-        cv_image = saida_net.copy()
+        
+
+        if PROCURANDO:
+            for i in GOAL:
+                LOCALIZADO, saida_net = detecta_esferas.processa_circulos_controle(temp_image, i)
+
+
+                if LOCALIZADO:
+                    font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+                    print ("objeto encontrado")
+                    cv2.putText(temp_image,"Objeto encontrado",(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
+                    REMOVE.append(i)
+
+        cv_image = temp_image.copy()
 
 
         if cv_image is not None:

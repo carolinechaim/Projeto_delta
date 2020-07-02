@@ -84,7 +84,7 @@ def maior_circulo(mask, color):
     return tem_circulo, maior_centro, maior_raio, output
 
 
-def processa_circulos_controle(img_bgr):
+def processa_circulos_controle(img_bgr, OBJETO):
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
     blue = mask(hsv, b1, b2)
     green = mask(hsv, g1, g2)
@@ -94,14 +94,23 @@ def processa_circulos_controle(img_bgr):
     cor_b = (255,0,0)
     cor_g = (0,255,0)
     cor_r = (0, 0,255)
-    tem_blue, centro_b, raio_n, img_b = maior_circulo(blue, cor_b)
-    tem_green, centro_g, raio_g, img_g = maior_circulo(green, cor_g)
-    tem_red, centro_r, raio_r, img_r = maior_circulo(red, cor_r)
+
+    if OBJETO == "red_sphere":
+        tem, centro_r, raio_r, img = maior_circulo(red, cor_r)
+        return tem, img
+
+    elif OBJETO == "blue_sphere":
+        tem, centro_b, raio_n, img = maior_circulo(blue, cor_b)
+        return tem, img
+
+    elif OBJETO == "green_sphere":
+        tem, centro_g, raio_g, img = maior_circulo(green, cor_g)
+        return tem, img 
+
+    else:
+        pass    
+
     
-    delta_blue = centro_b[0] - 320 # quão afastado está do centro da tela de 640 x 480
-    delta_green = centro_g[0] - 320 # quão afastado está do centro da tela de 640 x 480
-    delta_red = centro_r[0] - 320 # quão afastado está do centro da tela de 640 x 480
-    return tem_red, delta_red, img_r, tem_green, delta_green, img_g, tem_blue, delta_blue, img_b
 
 # Variaveis de controle
 
