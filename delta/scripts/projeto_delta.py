@@ -205,6 +205,7 @@ def go_to(x1, y1, pub, booleano):
 
         print ("dando volta 360:")
 
+
         vel_rot = Twist(Vector3(0,0,0), Vector3(0,0,v_ang))
         # publish
         pub.publish(vel_rot)
@@ -247,6 +248,8 @@ def roda_todo_frame(imagem):
         
 
         if PROCURANDO:
+            font = cv2.FONT_HERSHEY_SIMPLEX 
+            cv2.putText(temp_image,"Dando volta 360:",(200,50), font,1,(255,255,255),2,cv2.LINE_AA)
             
             for i in GOAL:
                 LOCALIZADO_SPHERE, centro_esfera, raio_esfera = detecta_esferas.processa_circulos_controle(temp_image, i)

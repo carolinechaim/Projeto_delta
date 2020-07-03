@@ -65,7 +65,7 @@ def maior_circulo(mask, color):
     # acumulador levemente ajustado
     circles=cv2.HoughCircles(image=bordas,method=cv2.HOUGH_GRADIENT,dp=2.2,minDist=250,param1=50,param2=100,minRadius=30,maxRadius=100)
     
-    bordas_bgr = cv2.cvtColor(bordas, cv2.COLOR_GRAY2RGB)
+    bordas_bgr = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
 
     output =  bordas_bgr
 
@@ -117,6 +117,9 @@ def processa_circulos_controle(img_bgr, OBJETO):
         cv2.waitKey(1)
     else:
         cv2.destroyWindow(img)
+
+
+
 
 
 
