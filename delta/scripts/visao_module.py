@@ -19,6 +19,7 @@ import mobilenet_simples as mnet
 
 
 def processa(frame, objeto):
+
     '''Use esta funcao para basear o processamento do seu robo'''
 
     result_frame, LOCALIZADO = mnet.detect(frame, objeto)
@@ -32,8 +33,14 @@ def processa(frame, objeto):
 
     cross(result_frame, centro, [255,0,0], 1, 17)
 
+    if result_frame is not None:
+        cv2.imshow("MOB", result_frame)
+        cv2.waitKey(1)
+    else:
+        cv2.destroyWindow(result_frame)
 
-    return  LOCALIZADO, result_frame
+
+    return  LOCALIZADO
 
 
 

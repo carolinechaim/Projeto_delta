@@ -96,7 +96,7 @@ def detect(frame, objeto):
 
                 results.append((CLASSES[idx], confidence*100, (startX, startY),(endX, endY) ))
         else:
-            image = frame
+            image =  None
             LOCALIZADO = False
 
 

@@ -63,7 +63,7 @@ def maior_circulo(mask, color):
     bordas = auto_canny(mask)
     
     # acumulador levemente ajustado
-    circles=cv2.HoughCircles(image=bordas,method=cv2.HOUGH_GRADIENT,dp=2.2,minDist=250,param1=50,param2=100,minRadius=30,maxRadius=250)
+    circles=cv2.HoughCircles(image=bordas,method=cv2.HOUGH_GRADIENT,dp=2.2,minDist=250,param1=50,param2=100,minRadius=30,maxRadius=100)
     
     bordas_bgr = cv2.cvtColor(bordas, cv2.COLOR_GRAY2RGB)
 
@@ -95,6 +95,8 @@ def processa_circulos_controle(img_bgr, OBJETO):
     cor_g = (0,255,0)
     cor_r = (0, 0,255)
 
+
+
     if OBJETO == "red_sphere":
         tem, centro, raio, img = maior_circulo(red, cor_r)
 
@@ -105,13 +107,20 @@ def processa_circulos_controle(img_bgr, OBJETO):
         tem, centro, raio, img = maior_circulo(green, cor_g)
 
     else:
+        img = None
         tem = False
-        centro = 0
-        raio = 0
-        img = img_bgr  
+        centro = (0,0)
+        raio = (0,0)
+
+    if img is not None:
+        cv2.imshow("Circulos", img)
+        cv2.waitKey(1)
+    else:
+        cv2.destroyWindow(img)
 
 
-    return tem, centro, raio, img   
+
+    return tem, centro, raio  
 
     
 

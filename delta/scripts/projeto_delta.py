@@ -26,7 +26,7 @@ import visao_module
 import detecta_esferas
 
 ####################
-GOAL = ["dog", "green_sphere"]
+GOAL = ["bird", "green_sphere"]
 ####################
 
 PROCURANDO = False
@@ -249,32 +249,33 @@ def roda_todo_frame(imagem):
         if PROCURANDO:
             
             for i in GOAL:
-                LOCALIZADO_SPHERE, centro_esfera, raio_esfera, saida_net = detecta_esferas.processa_circulos_controle(temp_image, i)
+                LOCALIZADO_SPHERE, centro_esfera, raio_esfera = detecta_esferas.processa_circulos_controle(temp_image, i)
                 if LOCALIZADO_SPHERE:
-                    y1 = centro_esfera[1]-raio_esfera[1]
-                    y2 = centro_esfera[1]+raio_esfera[1]
-                    x1 = centro_esfera[0]-raio_esfera[0]
-                    x2 = centro_esfera[0]+raio_esfera[0]
-                    submask = cv_image[y1:y2,x1:x2]
-                    font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+
+                    y1 = centro_esfera[1] - raio_esfera
+                    y2 = centro_esfera[1]+raio_esfera
+                    x1 = centro_esfera[0]-raio_esfera
+                    x2 = centro_esfera[0]+raio_esfera
+                    #submask = cv_image[y1:y2,x1:x2]
+                    font = cv2.FONT_HERSHEY_SIMPLEX 
                     print ("objeto {obj} encontrado".format(obj = i))
-                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
-                    cv2.imshow("{obj}".format(obj = i), submask)
+                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,30), font,1,(255,255,255),2,cv2.LINE_AA)
+                    #cv2.imshow("{obj}".format(obj = i), submask)
             
             for i in GOAL:
 
-                LOCALIZADO_MOB, saida_net =  visao_module.processa(temp_image,i) 
+                LOCALIZADO_MOB =  visao_module.processa(temp_image,i) 
 
                 if LOCALIZADO_MOB:
-                    font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+                    font = cv2.FONT_HERSHEY_SIMPLEX
                     print ("objeto {obj} encontrado".format(obj = i))
-                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
-                    cv2.imshow("{obj}".format(obj = i), cv_image)
+                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,50),font,1,(255,255,255),2,cv2.LINE_AA)
+                    #cv2.imshow("{obj}".format(obj = i), cv_image)
 
         cv_image = saida_net.copy()
 
         if cv_image is not None:
-            # Note que o imshow precisa ficar *ou* no codigo de tratamento de eventos *ou* no thread principal, não em ambos
+                # Note que o imshow precisa ficar *ou* no codigo de tratamento de eventos *ou* no thread principal, não em ambos
             cv2.imshow("cv_image no loop principal", cv_image)
             cv2.waitKey(1)        
 
