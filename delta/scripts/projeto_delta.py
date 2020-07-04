@@ -25,9 +25,14 @@ import visao_module
 
 import detecta_esferas
 
+global FINAL
+
 ####################
-GOAL = ["bird", "green_sphere"]
+GOAL = ["red_sphere","bird"]
 ####################
+
+REMOVE = ["red_sphere"]
+
 
 PROCURANDO = False
 LOCALIZADO_SPHERE = False
@@ -35,7 +40,7 @@ LOCALIZADO_MOB = False
 
 REMOVE =[]
 
-
+FINAL = False
 
 bridge = CvBridge()
 
@@ -245,6 +250,10 @@ def roda_todo_frame(imagem):
 
         saida_net = temp_image
 
+        if FINAL:
+            cv2.putText(temp_image,"FINAL DE SIMULACAO",(200,275), font,1,(255,255,255),2,cv2.LINE_AA)
+
+
         if PROCURANDO:
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(temp_image,"Estado:",(0,415), font,1,(255,255,255),2,cv2.LINE_AA)
@@ -256,6 +265,10 @@ def roda_todo_frame(imagem):
                 if LOCALIZADO_SPHERE:
                     font = cv2.FONT_HERSHEY_SIMPLEX 
                     print ("objeto {obj} encontrado".format(obj = i))
+                    if i in REMOVE:
+                        REMOVE.remove(i)
+
+
                     #cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,30), font,1,(255,255,255),2,cv2.LINE_AA)
   
             for i in GOAL:
@@ -265,6 +278,8 @@ def roda_todo_frame(imagem):
                 if LOCALIZADO_MOB:
                     font = cv2.FONT_HERSHEY_SIMPLEX
                     print ("objeto {obj} encontrado".format(obj = i))
+                    if i in REMOVE:
+                        REMOVE.remove(i)
                     #cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,50),font,1,(255,255,255),2,cv2.LINE_AA)
         else:
             font = cv2.FONT_HERSHEY_SIMPLEX
@@ -291,10 +306,10 @@ if __name__=="__main__":
     recebedor = rospy.Subscriber("/ar_pose_marker", AlvarMarkers, recebe) # Para recebermos notificacoes de que marcadores foram vistos
 
 
-    verts = [(0.0 , 0.0, False),(0.0 , -3.5, True), (-3.0 , -4,False),(-6.0 , -4,True), (-9.0 , -4,False),(-12.0,-4,False),(-15.0,-4,False),
-    (-18.0,-4,True), (-19.0,-4,False), (-19.0,0,True)]
+    verts = [(0.0 , 0.0, False),(0.0 , -3.5, True), (-3.0 , -3.5,False),(-6.0 , -3.5,False), (-9.0 , -3.5,True),(-12.0,-4,False),(-15.0,-4,False),
+    (-18.0,-4,False), (-19.0,-4,False), (-19.0,0,True)]
 
-
+    REMOVE = GOAL
     print("Usando ", topico_imagem)
 
     velocidade_saida = rospy.Publisher("/cmd_vel", Twist, queue_size = 1)
@@ -308,12 +323,19 @@ if __name__=="__main__":
         vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
         while not rospy.is_shutdown():
+
             for r in resultados:
                 print(r)
 
             for p in verts:
-                go_to(p[0],p[1], velocidade_saida, p[2])
-                rospy.sleep(1.0)
+                GOAL = REMOVE
+                if len(GOAL) == 0:
+                    FINAL = True
+                    print ("final de simulacao")
+                else:
+
+                    go_to(p[0],p[1], velocidade_saida, p[2])
+                    rospy.sleep(1.0)
             velocidade_saida.publish(vel)
 
             #rospy.sleep(0.1)

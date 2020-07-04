@@ -29,8 +29,8 @@ bridge = CvBridge()
 goal = "blue"
 
 # Limiares obtidos via color picker
-rl1, rl2 = (array([0,  80,  20], dtype=uint8), array([10, 255, 255], dtype=uint8)) # red lower
-ru1, ru2 = (array([170,  80,  20], dtype=uint8), array([180, 255, 255], dtype=uint8)) # red upper
+rl1, rl2 = (array([0,  80,  20], dtype=uint8), array([5, 255, 255], dtype=uint8)) # red lower
+ru1, ru2 = (array([175,  80,  20], dtype=uint8), array([180, 255, 255], dtype=uint8)) # red upper
 g1, g2 = (array([45, 80, 20], dtype=uint8), array([ 65, 255, 255], dtype=uint8))
 b1, b2 = (array([105,  80,  20], dtype=uint8), array([125, 255, 255], dtype=uint8))
 
@@ -80,6 +80,7 @@ def maior_circulo(mask, color):
             cv2.circle(output,(i[0],i[1]),2,color,3)
             if i[2] > maior_raio:
                 maior_centro = (int(i[0]), int(i[1]))
+                maior_raio = i[2]
                                 
     return tem_circulo, maior_centro, maior_raio, output
 
@@ -108,19 +109,24 @@ def processa_circulos_controle(img_bgr, OBJETO):
         img = None
         tem = False
         centro = (0,0)
-        raio = (0,0)
+        raio = 0
 
-    if (img is not None) and tem:
+    if (img_bgr is not None) and tem:
 
         x1 = centro[0] - raio
         y1 = centro[1] - raio
         x2 = centro[0] + raio
         y2 = centro[1] + raio
 
-        sphere_slice = img[y1:y2, x1:x2]
+        sphere_slice = img_bgr[y1:y2, x1:x2].copy()
 
-        cv2.imshow("SPHERE", sphere_slice)
-        cv2.waitKey(1)
+        if sphere_slice is not None:
+
+            cv2.imshow("SPHERE", sphere_slice)
+            cv2.waitKey(1)
+
+        else:
+            print("retornando nulo")
 
     return tem  
 
