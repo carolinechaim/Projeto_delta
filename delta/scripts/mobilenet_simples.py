@@ -98,10 +98,14 @@ def detect(frame, objeto):
         else:
             image =  None
             LOCALIZADO = False
+            startX = 0
+            startY = 0
+            endX = 1
+            endY = 1
 
 
     # show the output image
-        return image, LOCALIZADO
+        return image, LOCALIZADO, startX, startY, endX, endY
 
 
 

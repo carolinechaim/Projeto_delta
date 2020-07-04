@@ -95,8 +95,6 @@ def processa_circulos_controle(img_bgr, OBJETO):
     cor_g = (0,255,0)
     cor_r = (0, 0,255)
 
-
-
     if OBJETO == "red_sphere":
         tem, centro, raio, img = maior_circulo(red, cor_r)
 
@@ -112,18 +110,19 @@ def processa_circulos_controle(img_bgr, OBJETO):
         centro = (0,0)
         raio = (0,0)
 
-    if img is not None:
-        cv2.imshow("Circulos", img)
+    if (img is not None) and tem:
+
+        x1 = centro[0] - raio
+        y1 = centro[1] - raio
+        x2 = centro[0] + raio
+        y2 = centro[1] + raio
+
+        sphere_slice = img[y1:y2, x1:x2]
+
+        cv2.imshow("SPHERE", sphere_slice)
         cv2.waitKey(1)
-    else:
-        cv2.destroyWindow(img)
 
-
-
-
-
-
-    return tem, centro, raio  
+    return tem  
 
     
 

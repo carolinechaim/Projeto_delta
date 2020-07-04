@@ -218,7 +218,7 @@ def go_to(x1, y1, pub, booleano):
 
 # A função a seguir é chamada sempre que chega um novo frame
 def roda_todo_frame(imagem):
-    print("frame")
+    #print("frame")
     global cv_image
     global media
     global centro
@@ -245,26 +245,19 @@ def roda_todo_frame(imagem):
 
         saida_net = temp_image
 
-        
-
         if PROCURANDO:
-            font = cv2.FONT_HERSHEY_SIMPLEX 
-            cv2.putText(temp_image,"Dando volta 360:",(200,50), font,1,(255,255,255),2,cv2.LINE_AA)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(temp_image,"Estado:",(0,415), font,1,(255,255,255),2,cv2.LINE_AA)
+            cv2.putText(temp_image,"     Andando",(0,445), font,1,(255,255,255),2,cv2.LINE_AA)
+            cv2.putText(temp_image," -> Giro 360 / Procurando",(0,475), font,1,(255,255,255),2,cv2.LINE_AA)
             
             for i in GOAL:
-                LOCALIZADO_SPHERE, centro_esfera, raio_esfera = detecta_esferas.processa_circulos_controle(temp_image, i)
+                LOCALIZADO_SPHERE = detecta_esferas.processa_circulos_controle(temp_image, i)
                 if LOCALIZADO_SPHERE:
-
-                    y1 = centro_esfera[1] - raio_esfera
-                    y2 = centro_esfera[1]+raio_esfera
-                    x1 = centro_esfera[0]-raio_esfera
-                    x2 = centro_esfera[0]+raio_esfera
-                    #submask = cv_image[y1:y2,x1:x2]
                     font = cv2.FONT_HERSHEY_SIMPLEX 
                     print ("objeto {obj} encontrado".format(obj = i))
-                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,30), font,1,(255,255,255),2,cv2.LINE_AA)
-                    #cv2.imshow("{obj}".format(obj = i), submask)
-            
+                    #cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,30), font,1,(255,255,255),2,cv2.LINE_AA)
+  
             for i in GOAL:
 
                 LOCALIZADO_MOB =  visao_module.processa(temp_image,i) 
@@ -272,8 +265,12 @@ def roda_todo_frame(imagem):
                 if LOCALIZADO_MOB:
                     font = cv2.FONT_HERSHEY_SIMPLEX
                     print ("objeto {obj} encontrado".format(obj = i))
-                    cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,50),font,1,(255,255,255),2,cv2.LINE_AA)
-                    #cv2.imshow("{obj}".format(obj = i), cv_image)
+                    #cv2.putText(temp_image,"objeto {obj} encontrado".format(obj = i),(0,50),font,1,(255,255,255),2,cv2.LINE_AA)
+        else:
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(temp_image,"Estado:",(0,415), font,1,(255,255,255),2,cv2.LINE_AA)
+            cv2.putText(temp_image," -> Andando",(0,445), font,1,(255,255,255),2,cv2.LINE_AA)
+            cv2.putText(temp_image,"     Giro 360 / Procurando",(0,475), font,1,(255,255,255),2,cv2.LINE_AA)
 
         cv_image = saida_net.copy()
 
