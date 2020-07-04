@@ -251,6 +251,7 @@ def roda_todo_frame(imagem):
         saida_net = temp_image
 
         if FINAL:
+            font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(temp_image,"FINAL DE SIMULACAO",(200,275), font,1,(255,255,255),2,cv2.LINE_AA)
 
 
